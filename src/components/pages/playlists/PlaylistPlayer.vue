@@ -774,6 +774,9 @@
           <a class="dl-button zip-button" :href="csvDlPath">
             {{ $t('playlists.download_csv') }}
           </a>
+          <a class="dl-button zip-button" :href="xmlDlPath">
+            {{ $t('playlists.download_xml') }}
+          </a>
           <span
             :class="{
               'dl-button': true,
@@ -1212,6 +1215,10 @@ export default {
 
     zipDlPath() {
       return `/api/data/playlists/${this.playlist.id}/download/zip`
+    },
+
+    xmlDlPath() {
+      return `/api/export/xml/playlists/${this.playlist.id}`
     },
 
     deleteText() {

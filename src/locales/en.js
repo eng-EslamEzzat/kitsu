@@ -852,6 +852,7 @@ export default {
     edit_error: 'An error occurred while saving this playlist.',
     download_csv: 'Download .csv',
     download_zip: 'Download .zip',
+    download_xml: 'Download .xml',
     failed: 'Failed',
     filter_task_type: 'Filtered by task type',
     for_client: 'The Client',
