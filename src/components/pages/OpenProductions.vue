@@ -1,58 +1,5 @@
 <template>
   <div class="open-productions page">
-    <div class="social-contributions" v-if="isContributions">
-      <h1 class="subtitle has-text-centered">
-        {{ $t('intro.title') }}
-      </h1>
-      <div class="flexrow">
-        <img
-          class="flexrow-item kitsu-with-body"
-          src="../../assets/illustrations/kitsu-band.png"
-        />
-        <div class="filler">
-          <span class="close-contributions" @click="hideContributions">
-            <x-icon :size="14" />
-          </span>
-          <p>
-            {{ $t('intro.main') }}
-          </p>
-          <ul>
-            <li>
-              {{ $t('intro.first') }}
-              <a href="https://github.com/cgwire/kitsu">GitHub</a>
-            </li>
-            <li>
-              {{ $t('intro.second') }}
-              <a href="https://twitter.com/cgwirekitsu">X</a>
-              {{ $t('main.or') }}
-              <a href="https://www.linkedin.com/company/cgwire/">LinkedIn</a>
-            </li>
-            <li>
-              {{ $t('intro.third') }}
-              <a href="https://discord.gg/VbCxtKN">Discord</a>
-            </li>
-            <li>
-              {{ $t('intro.four') }}
-              <a href="https://cgwire.canny.io">Canny</a>
-            </li>
-            <li>
-              {{ $t('intro.five') }}
-              <a href="https://liberapay.com/CGWire/donate">Liberapay</a>
-            </li>
-            <li>
-              {{ $t('intro.six') }}
-              <a href="https://cg-wire.com/pricing">offers</a>
-            </li>
-            <li>
-              {{ $t('intro.seven') }}
-            </li>
-          </ul>
-          <p>
-            {{ $t('intro.eight') }}
-          </p>
-        </div>
-      </div>
-    </div>
     <div class="has-text-centered" v-if="isOpenProductionsLoading">
       <spinner />
     </div>
@@ -150,7 +97,6 @@
 </template>
 
 <script>
-import { XIcon } from 'lucide-vue'
 import { mapGetters } from 'vuex'
 
 import { buildNameIndex } from '@/lib/indexing'
@@ -165,8 +111,7 @@ export default {
 
   components: {
     SearchField,
-    Spinner,
-    XIcon
+    Spinner
   },
 
   data() {

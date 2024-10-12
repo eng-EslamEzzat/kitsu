@@ -155,13 +155,6 @@
         <li @click="toggleDarkTheme">
           {{ !isDarkTheme ? $t('main.dark_theme') : $t('main.white_theme') }}
         </li>
-        <li @click="setSupportChat(!isSupportChat)">
-          {{
-            isSupportChat
-              ? $t('main.hide_support_chat')
-              : $t('main.show_support_chat')
-          }}
-        </li>
         <hr />
         <li>
           <a
@@ -174,23 +167,6 @@
         <li>
           <a @click="display.shortcutModal = true">
             {{ $t('keyboard.shortcuts') }}
-          </a>
-        </li>
-        <hr />
-        <li>
-          <a href="https://discord.gg/VbCxtKN" target="_blank"> Discord </a>
-        </li>
-        <li>
-          <a href="https://linkedin.com/company/cgwire/" target="_blank">
-            LinkedIn
-          </a>
-        </li>
-        <li>
-          <a href="https://twitter.com/cgwirekitsu" target="_blank"> X </a>
-        </li>
-        <li>
-          <a href="https://cgwire.canny.io" target="_blank">
-            Roadmap / Feedback
           </a>
         </li>
         <hr />
