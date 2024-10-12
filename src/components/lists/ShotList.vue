@@ -802,10 +802,12 @@ export default {
       'isTVShow',
       'nbSelectedTasks',
       'selectedShots',
+      'selectedTasks',
       'sequenceMap',
       'shotFilledColumns',
       'shotMap',
       'shotMetadataDescriptors',
+      'shots',
       'shotSearchText',
       'shotSelectionGrid',
       'taskMap',
@@ -1240,67 +1242,6 @@ span.thumbnail-empty {
 
 .datatable-row-header {
   cursor: pointer;
-}
-
-.dark {
-  th .input-editor,
-  td .select select,
-  td .input-editor {
-    color: $white;
-
-    option {
-      background: $dark-grey-light;
-      color: $white;
-    }
-
-    &:focus,
-    &:active,
-    &:hover {
-      background: $dark-grey-light;
-    }
-  }
-}
-
-td.frames,
-td.framein,
-td.frameout,
-td.max-retakes,
-td.resolution,
-td.fps {
-  height: 3.1rem;
-  padding: 0;
-}
-
-th .input-editor,
-td .input-editor {
-  color: $grey-strong;
-  height: 100%;
-  padding: 0.5rem;
-  width: 100%;
-  background: transparent;
-  border: 1px solid transparent;
-  z-index: 100;
-
-  &:active,
-  &:focus,
-  &:hover {
-    background: transparent;
-    background: white;
-  }
-
-  &:active,
-  &:focus {
-    border: 1px solid $green;
-  }
-
-  &:hover {
-    border: 1px solid $light-green;
-  }
-
-  &:invalid,
-  &.error {
-    color: $red;
-  }
 }
 
 input[type='number']::-webkit-outer-spin-button,

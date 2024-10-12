@@ -71,28 +71,34 @@
                 placeholder="ex: retake chara"
               />
             </div>
-            <div class="flexrow-item" v-if="isActiveTab('tasks')">
+            <div class="flexrow-item flexrow" v-if="isActiveTab('tasks')">
               <combobox-styled
+                class="flexrow-item"
                 :label="$t('tasks.due_date')"
                 :options="dueDateOptions"
                 locale-key-prefix="tasks."
                 v-model="dueDateFilter"
               />
-            </div>
-            <div class="flexrow-item" v-if="isActiveTab('tasks')">
               <combobox-styled
+                class="flexrow-item"
                 :label="$t('tasks.late')"
                 :options="estimationOptions"
                 locale-key-prefix="tasks."
                 v-model="estimationFilter"
               />
-            </div>
-            <div class="flexrow-item" v-if="isActiveTab('tasks')">
               <combobox-styled
+                class="flexrow-item"
                 :label="$t('task_types.fields.priority')"
                 :options="priorityOptions"
                 locale-key-prefix="tasks."
                 v-model="priorityFilter"
+              />
+              <combobox-styled
+                class="flexrow-item"
+                :label="$t('tasks.fields.difficulty')"
+                :options="difficultyOptions"
+                locale-key-prefix="tasks."
+                v-model="difficultyFilter"
               />
             </div>
             <div class="filler"></div>
@@ -427,8 +433,17 @@ export default {
       entityType: 'Asset',
       estimationFilter: 'all',
       priorityFilter: '-1',
+      difficultyFilter: '-1',
       tasks: [],
       selection: {},
+      difficultyOptions: [
+        { label: 'all_tasks', value: '-1' },
+        { label: 'difficulty.very_easy', value: '1' },
+        { label: 'difficulty.easy', value: '2' },
+        { label: 'difficulty.medium', value: '3' },
+        { label: 'difficulty.hard', value: '4' },
+        { label: 'difficulty.very_hard', value: '5' }
+      ],
       dueDateOptions: [
         { label: 'all_tasks', value: 'all' },
         { label: 'due_this_week', value: 'dueweek' },
@@ -702,6 +717,8 @@ export default {
         'entity_name',
         'task_status_short_name',
         'priority',
+        'nb_frames',
+        'difficulty',
         'estimation',
         'duration',
         'retake_count',
@@ -738,6 +755,7 @@ export default {
 
   methods: {
     ...mapActions([
+      'addSelectedTask',
       'clearSelectedTasks',
       'initTaskType',
       'loadAggregatedPersonDaysOff',
@@ -782,6 +800,16 @@ export default {
             this.dueDateFilter = this.$route.query.duedate || 'all'
             this.estimationFilter = this.$route.query.late || 'all'
             this.priorityFilter = this.$route.query.priority || '-1'
+            this.difficultyFilter = this.$route.query.difficulty || '-1'
+
+            const taskId = this.$route.query.task_id
+            const task = this.taskMap.get(taskId)
+            if (task) {
+              const index = this.tasks.findIndex(t => t.id === taskId)
+              this.$nextTick(() => {
+                this.$refs['task-list'].selectTask({}, index, task)
+              })
+            }
           })
           .catch(err => {
             console.error(err)
@@ -928,6 +956,11 @@ export default {
           t => t.priority === parseInt(this.priorityFilter)
         )
       }
+      if (this.difficultyFilter !== '-1') {
+        this.tasks = this.tasks.filter(
+          t => t.difficulty === parseInt(this.difficultyFilter)
+        )
+      }
     },
 
     saveSearchQuery(searchQuery) {
@@ -952,8 +985,9 @@ export default {
       const duedate = this.dueDateFilter
       const late = this.estimationFilter
       const priority = this.priorityFilter
+      const difficulty = this.difficultyFilter
       this.$router.push({
-        query: { search, duedate, late, priority }
+        query: { search, duedate, late, priority, difficulty }
       })
     },
 
@@ -969,6 +1003,27 @@ export default {
 
     onTaskSelected(task) {
       this.currentTask = task
+      this.updateTaskInQuery()
+    },
+
+    updateTaskInQuery() {
+      if (this.nbSelectedTasks === 1) {
+        const selectedTaskIds = Array.from(this.selectedTasks.keys())
+        const taskId = selectedTaskIds[0]
+        this.$router.push({
+          query: {
+            ...this.$route.query,
+            task_id: taskId
+          }
+        })
+      } else {
+        this.$router.push({
+          query: {
+            ...this.$route.query,
+            task_id: undefined
+          }
+        })
+      }
     },
 
     resetTasks() {
@@ -1021,7 +1076,13 @@ export default {
         'entity_name',
         'due_date'
       ].includes(this.currentSort)
-      if (this.currentSort !== name) {
+      if (this.currentSort === 'nb_frames') {
+        this.tasks = tasks.sort((ta, tb) => {
+          const nbFramesA = this.getEntity(ta.entity.id)?.nb_frames || 0
+          const nbFramesB = this.getEntity(tb.entity.id)?.nb_frames || 0
+          return nbFramesB - nbFramesA
+        })
+      } else if (this.currentSort !== name) {
         this.tasks = tasks.sort(
           firstBy(this.currentSort, isDesc ? 1 : -1).thenBy('entity_name')
         )
@@ -1029,6 +1090,10 @@ export default {
         this.tasks = tasks.sort(firstBy('entity_name'))
       }
       return tasks
+    },
+
+    getEntity(entityId) {
+      return this[`${this.entityType.toLowerCase()}Map`].get(entityId) || {}
     },
 
     onExportClick() {
@@ -1430,6 +1495,10 @@ export default {
       this.initData(true)
     },
 
+    nbSelectedTasks() {
+      this.updateTaskInQuery()
+    },
+
     // Quickfix for the edge case where the backPath is not properly set
     // because it was set when the episode was not fully loaded.
     currentEpisode() {
@@ -1453,10 +1522,15 @@ export default {
       this.applyTaskFilters()
     },
 
+    difficultyFilter() {
+      this.applyTaskFilters()
+    },
+
     currentSort() {
       this.sortTasks()
       this.$refs['task-list'].resetSelection()
       this.clearSelectedTasks()
+      this.updateTaskInQuery()
     },
 
     'schedule.currentColor'() {

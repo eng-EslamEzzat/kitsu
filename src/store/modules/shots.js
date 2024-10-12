@@ -230,7 +230,11 @@ const helpers = {
     result = sortShotResult(result, sorting, taskTypeMap, taskMap)
     cache.result = result
 
-    const displayedShots = result.slice(0, PAGE_SIZE)
+    const limit =
+      state.displayedShots.length > PAGE_SIZE
+        ? state.displayedShots.length
+        : PAGE_SIZE
+    const displayedShots = result.slice(0, limit)
     const maxX = displayedShots.length
     const maxY = state.nbValidationColumns
 
@@ -288,6 +292,7 @@ const state = {
 }
 
 const getters = {
+  shots: state => cache.shots,
   shotValidationColumns: state => state.shotValidationColumns,
 
   shotSearchQueries: state => state.shotSearchQueries,
@@ -382,7 +387,6 @@ const actions = {
     const userFilters = rootGetters.userFilters
     const userFilterGroups = rootGetters.userFilterGroups
     const taskTypeMap = rootGetters.taskTypeMap
-    const taskMap = rootGetters.taskMap
     const episodeMap = rootGetters.episodeMap
     const personMap = rootGetters.personMap
     const isTVShow = rootGetters.isTVShow
@@ -420,6 +424,7 @@ const actions = {
       })
       .then(shots => {
         const sequenceMap = rootGetters.sequenceMap
+        const taskMap = rootGetters.taskMap
         commit(LOAD_SHOTS_END, {
           production,
           shots,
@@ -858,8 +863,8 @@ const mutations = {
       let estimation = 0
       const sequence = sequenceMap.get(shot.sequence_id)
       const episode = episodeMap.get(shot.episode_id)
-      shot.sequence_name = sequence.name
-      shot.episode_name = episode ? episode.name : ''
+      shot.sequence_name = sequence?.name || ''
+      shot.episode_name = episode?.name || ''
       shot.project_name = production.name
       shot.production_id = production.id
       shot.full_name = helpers.getShotName(shot)
@@ -1140,6 +1145,17 @@ const mutations = {
   },
 
   [REMOVE_SELECTED_TASK](state, validationInfo) {
+    if (
+      !validationInfo.x &&
+      validationInfo.task?.column &&
+      state.shotMap.get(validationInfo.task.entity.id)
+    ) {
+      const entity = validationInfo.task.entity
+      const taskType = validationInfo.task.column
+      const list = state.displayedShots.flat()
+      validationInfo.x = list.findIndex(e => e.id === entity.id)
+      validationInfo.y = state.shotValidationColumns.indexOf(taskType.id)
+    }
     if (
       state.shotSelectionGrid[0] &&
       state.shotSelectionGrid[validationInfo.x]

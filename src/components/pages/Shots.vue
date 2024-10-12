@@ -451,7 +451,18 @@ export default {
     }
     this.$refs['shot-search-field']?.setValue(searchQuery)
     const finalize = () => {
-      this.loadShots(() => {})
+      this.$nextTick(() => {
+        // Needed to be sure the current production is set
+        this.loadShots(() => {
+          this.$nextTick(() => {
+            // Needed to be sure the shots are loaded
+            this.onSearchChange()
+            this.$nextTick(() => {
+              this.$refs['shot-list'].selectTaskFromQuery()
+            })
+          })
+        })
+      })
     }
 
     if (
@@ -460,23 +471,24 @@ export default {
         (!this.shotMap.get(this.shotMap.keys().next().value) ||
           !this.shotMap.get(this.shotMap.keys().next().value).validations))
     ) {
-      setTimeout(() => {
-        if (
-          this.currentProduction &&
-          this.episodes.length > 0 &&
-          this.episodes[0].project_id !== this.currentProduction.id
-        ) {
-          this.loadEpisodes()
-            .then(() => finalize())
-            .catch(console.error)
-        } else {
-          finalize()
-        }
-      }, 100)
+      if (
+        this.currentProduction &&
+        this.episodes.length > 0 &&
+        this.episodes[0].project_id !== this.currentProduction.id
+      ) {
+        this.loadEpisodes()
+          .then(() => finalize())
+          .catch(console.error)
+      } else {
+        finalize()
+      }
     } else {
       if (!this.isShotsLoading) this.initialLoading = false
       this.onSearchChange()
       this.$refs['shot-list'].setScrollPosition(this.shotListScrollPosition)
+      this.$nextTick(() => {
+        this.$refs['shot-list'].selectTaskFromQuery()
+      })
     }
   },
 
@@ -487,6 +499,7 @@ export default {
       'currentSection',
       'departmentMap',
       'displayedSequences',
+      'displayedShots',
       'displayedShotsBySequence',
       'episodeMap',
       'episodes',
@@ -575,6 +588,7 @@ export default {
       'createTasks',
       'changeShotSort',
       'clearSelectedShots',
+      'clearSelectedTasks',
       'commentTaskWithPreview',
       'deleteAllShotTasks',
       'deleteShot',
@@ -931,6 +945,7 @@ export default {
       if (searchQuery.length === 0 && this.isLongShotList) {
         this.applySearch('')
       }
+      this.clearSelection()
     },
 
     saveScrollPosition(scrollPosition) {
@@ -1155,7 +1170,8 @@ export default {
     currentSection() {
       if (
         (this.isTVSHow && this.displayedSequences.length === 0) ||
-        this.displayedSequences[0]?.episode_id !== this.currentEpisode?.id
+        this.displayedSequences[0]?.episode_id !== this.currentEpisode?.id ||
+        this.displayedShots[0]?.episode_id !== this.currentEpisode?.id
       ) {
         this.$refs['shot-search-field'].setValue('')
         this.$store.commit('SET_SHOT_LIST_SCROLL_POSITION', 0)

@@ -32,7 +32,8 @@ export default {
       ready_for: 'Ready for',
       time_spent: 'Time',
       type: 'Type',
-      hidden_from_client: 'Displayed to client'
+      hidden_from_client: 'Displayed to client',
+      shared: 'Shared in Asset Library',
     }
   },
 
@@ -107,9 +108,11 @@ export default {
     edit_label: 'Change the asset\'s label',
     empty: 'Empty casting',
     episode_casting: 'Episode casting',
+    hide_library: 'Hide Library',
     label: 'Label',
     picture_mode: 'Switch to picture mode',
     save_error: 'Error while saving casting',
+    show_library: 'Display Library',
     text_mode: 'Switch to text mode',
     title: 'Breakdown',
     options: {
@@ -490,7 +493,9 @@ export default {
       totp: 'TOTP',
       email_otp: 'OTP via email',
       recovery_code: 'Recovery code'
-    }
+    },
+    login_with_saml: 'SSO login with {saml_idp_name}',
+    login_saml: 'SSO login',
   },
 
   logs: {
@@ -546,6 +551,8 @@ export default {
     days: 'days',
     days_spent: 'day spent | days spent',
     days_estimated: 'day estimated | days estimated',
+    hours_spent: 'hour spent | hours spent',
+    hours_estimated: 'hour estimated | hours estimated',
     delete: 'Delete',
     delete_all: 'Delete all',
     delete_text: 'Are you sure you want to remove {name} from your database?',
@@ -728,20 +735,37 @@ export default {
   },
 
   notifications: {
-    and_change_status: 'and changed status to',
+    and_change_status: 'and changed the task status',
+    all_statuses: 'Read and Unread',
     all_types: 'All types',
-    assigned_you: 'assigned you to',
-    commented_on: 'commented on',
-    mention_you_on: 'mentioned you on',
+    all_notifications: 'All notifications',
+    assignation: 'Assignation',
+    assigned_you: 'assigned you to this task',
+    comment: 'Comment',
+    commented_on: 'commented',
+    initial_comment: 'Initial comment',
+    mark_all_as_read: 'Mark all as read',
+    mention: 'Mention',
+    mention_you_on: 'mentioned you in a comment',
     new_revision: 'New revision published',
     no_notifications: 'There are currently no notifications for you for your current projects.',
     only_assignations: 'Only assignments',
     only_comments: 'Only comments',
     only_mentions: 'Only mentions',
+    only_non_watching: 'Only non-watching',
+    only_read: 'Only read',
     only_replies: 'Only replies',
-    replied_on: 'replied to a comment on',
+    only_unread: 'Only unread',
+    only_watching: 'Only watching',
+    read: 'read',
+    reply: 'Reply',
+    replied_on: 'replied to a comment',
+    publish: 'Publish',
+    published: 'published a preview',
+    show_comments: 'Show comments',
     unread_notifications: 'unread notification | unread notifications',
     title: 'Notifications',
+    watching: 'watching',
     with_preview: 'with a preview'
   },
 
@@ -1019,6 +1043,7 @@ export default {
       fps: 'FPS',
       is_clients_isolated: 'Isolate client comments (not visible to each others)',
       is_preview_download_allowed: 'Allow artists to download previews',
+      is_publish_default: 'Set comment widget for artists on publish mode by default',
       is_set_preview_automated: 'Set new preview as entity thumbnail automatically',
       max_retakes: 'Maximum number of retakes',
       name: 'Name',
@@ -1191,7 +1216,9 @@ export default {
       discord_token: 'Discord Token (Optional)',
       timesheets_locked: 'Lock artist timesheets older than 1 week',
       use_original_name: 'Use original file name for downloads',
-      show_hd_default: 'Show movies with HD quality by default (slower)'
+      show_hd_default: 'Show movies with HD quality by default (slower)',
+      format_duration_in_hours: 'Display durations and estimations in hours',
+      dark_theme_by_default: 'Use dark theme by default'
     },
     production: {
       empty_list: 'The list is currently empty. It means that all data from the main settings are available to users. Add some entries to limit choices for this production.',
@@ -1285,6 +1312,7 @@ export default {
     delete_error: 'An error occurred while deleting this edit. There may be existing data currently linked to it.',
     delete_for_selection: 'Delete the selected edit | Delete the {nbSelectedEdits} selected edits',
     edit_error: 'An error occurred while saving this edit. Are you sure there is no edit with a similar name?',
+    edit_success: 'Modifications were saved successfully.',
     edit_title: 'Change edit',
     empty_list: 'There are no edits in the production. How about creating some?',
     empty_list_client: 'There are no edits in this production.',
@@ -1548,10 +1576,18 @@ export default {
     validated: 'Validated',
     validation: 'Validation',
     with_comment: 'With a comment...',
+    difficulty: {
+      very_easy: 'Very easy',
+      easy: 'Easy',
+      medium: 'Medium',
+      hard: 'Hard',
+      very_hard: 'Very hard'
+    },
     fields: {
       asset_type: 'Asset type',
       assignees: 'Assignees',
       count: 'Count',
+      difficulty: 'Difficulty',
       done_date: 'Approval date',
       due_date: 'Due date',
       duration: 'Duration',
@@ -1563,6 +1599,7 @@ export default {
       frames: 'Fram.',
       last_comment: 'Last comment',
       last_comment_date: 'Last comment',
+      nb_frames: 'Frames',
       parent: 'Parent',
       priority: 'Priority',
       production: 'Prod',
@@ -1638,7 +1675,30 @@ export default {
     delete: 'Delete day off',
     confirm_day_offs: 'Setting these days off will erase all time filled for the affected days. Are you sure you want to continue?',
     confirm_unset_day_offs: 'Days off are currently applied from {start} to {end}. Are you sure you want to remove this period?',
-    error_days_off: 'An error occurred while updating days off.',
+    error_days_off: 'An error occurred while updating days off.'
+  },
+
+  library: {
+    asset_library: 'Asset Library',
+    from_library: 'From the asset library',
+    import_from_asset_type: 'Import all assets from selected type and production',
+    import_from_assets: 'Import assets from the selected production and asset type',
+    import_from_list: 'Import selected assets from the list',
+    import_from_production: 'Import all assets from selected production',
+    manage: 'Add assets to your library',
+    no_entities: 'No entities are available',
+    no_open_productions: 'No open productions',
+    no_shared_assets: 'No shared assets are available',
+    remove_selected_assets: 'Remove the selected asset from the library | Remove {nbSelectedAssets} selected assets from the library',
+    select_asset_type: 'Select an asset type',
+    select_production: 'Select a production',
+    selected_assets: 'Selected assets',
+    fields: {
+      name: 'Name',
+      production: 'Production',
+      created_at: 'Creation date',
+      updated_at: 'Update date'
+    }
   },
 
   wrong_browser: {

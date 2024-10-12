@@ -157,6 +157,7 @@
             :panzoom="false"
             :preview="currentPreviewToCompare"
             :is-comparing="isComparing"
+            high-quality
             @loaded="onPictureLoaded"
             v-show="isComparing && isPictureComparison"
           />
@@ -264,6 +265,7 @@
             :margin-bottom="0"
             :panzoom="false"
             :preview="currentPreview"
+            high-quality
           />
         </div>
 
@@ -1593,12 +1595,12 @@ export default {
         if (this.$refs['picture-preview-wrapper']) {
           this.$refs['picture-preview-wrapper'].style.height = `${height}px`
         }
-        this.pictureDefaultHeight = height
 
         if (this.$refs['full-playlist-player']) {
           this.$refs['full-playlist-player'].style.height = `${height}px`
         }
 
+        this.pictureDefaultHeight = height
         if (this.rawPlayer) this.rawPlayer.resetHeight(height)
         if (this.isComparing && this.$refs['raw-player-comparison']) {
           this.$refs['raw-player-comparison'].resetHeight(height)
@@ -2050,6 +2052,8 @@ export default {
         }
         this.$nextTick(() => {
           if (this.isCurrentPreviewPicture) {
+            this.triggerResize()
+            this.resetHeight()
             this.resetPictureCanvas()
           } else {
             this.resetCanvas()
@@ -2060,6 +2064,13 @@ export default {
 
     fullScreen() {
       this.resetHeight()
+      setTimeout(() => {
+        if (this.isCurrentPreviewPicture) {
+          this.triggerResize()
+          this.resetHeight()
+          this.resetPictureCanvas()
+        }
+      }, 300)
     },
 
     isComparing() {
@@ -2069,7 +2080,7 @@ export default {
         this.rebuildEntityListToCompare()
       }
       this.$nextTick().then(() => {
-        window.dispatchEvent(new Event('resize'))
+        this.triggerResize()
         this.resetPictureCanvas()
         this.resetCanvas()
         this.syncComparisonPlayer()
@@ -2139,6 +2150,14 @@ export default {
     isAddingEntity() {
       this.$nextTick(() => {
         this.updateProgressBar()
+      })
+    },
+
+    isEntitiesHidden() {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.triggerResize()
+        }, 300)
       })
     },
 

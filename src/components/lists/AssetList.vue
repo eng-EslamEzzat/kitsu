@@ -114,6 +114,7 @@
             >
               {{ $t('assets.fields.description') }}
             </th>
+
             <th
               scope="col"
               class="time-spent number-cell"
@@ -141,6 +142,18 @@
               "
             >
               {{ $t('main.estimation_short') }}
+            </th>
+
+            <th
+              scope="col"
+              class="resolution"
+              v-if="
+                isAssetResolution &&
+                isShowInfos &&
+                metadataDisplayHeaders.resolution
+              "
+            >
+              {{ $t('shots.fields.resolution') }}
             </th>
 
             <metadata-header
@@ -189,13 +202,13 @@
 
               <table-metadata-selector-menu
                 ref="headerMetadataSelectorMenu"
-                :metadata-display-headers.sync="metadataDisplayHeaders"
+                namespace="assets"
                 :descriptors="assetMetadataDescriptors"
+                :metadata-display-headers.sync="metadataDisplayHeaders"
                 :exclude="{
                   timeSpent: !isAssetTime,
                   estimation: !isAssetEstimation
                 }"
-                namespace="assets"
                 v-show="columnSelectorDisplayed && isShowInfos"
               />
 
@@ -215,7 +228,7 @@
           v-for="(group, k) in displayedAssets"
           v-if="!isLoading && isListVisible"
         >
-          <tr class="datatable-type-header">
+          <tr class="datatable-type-header" v-if="group[0]">
             <th scope="rowgroup" :colspan="visibleColumns">
               <span
                 class="datatable-row-header pointer"
@@ -228,9 +241,13 @@
 
           <tr
             class="datatable-row"
+            :class="{
+              canceled: asset.canceled,
+              shared: asset.shared
+            }"
             scope="row"
-            :key="'row' + asset.id"
-            :class="{ canceled: asset.canceled }"
+            :key="`row${asset.id}`"
+            :title="asset.shared ? $t('library.from_library') : undefined"
             v-for="(asset, i) in group"
           >
             <th
@@ -245,6 +262,7 @@
                   type="checkbox"
                   class="flexrow-item"
                   :checked="selectedAssets.has(asset.id)"
+                  :disabled="asset.shared"
                   @input="event => toggleLine(asset, event)"
                   v-show="isCurrentUserManager"
                 />
@@ -261,9 +279,13 @@
                   class="asset-link asset-name flexrow-item"
                   :to="assetPath(asset.id)"
                   :title="asset.full_name"
+                  v-if="!asset.shared"
                 >
                   {{ asset.name }}
                 </router-link>
+                <template v-else>
+                  {{ asset.name }}
+                </template>
               </div>
             </th>
 
@@ -374,6 +396,42 @@
               {{ formatDuration(asset.estimation) }}
             </td>
 
+            <td
+              class="resolution"
+              v-if="
+                isAssetResolution &&
+                isShowInfos &&
+                metadataDisplayHeaders.resolution
+              "
+            >
+              <input
+                :class="{
+                  'input-editor': true,
+                  error: !isValidResolution(asset)
+                }"
+                :value="
+                  getMetadataFieldValue({ field_name: 'resolution' }, asset)
+                "
+                @input="
+                  event =>
+                    onMetadataFieldChanged(
+                      asset,
+                      { field_name: 'resolution' },
+                      event
+                    )
+                "
+                @keyup.ctrl="
+                  event =>
+                    onInputKeyUp(event, getIndex(i, k), descriptorLength + 3)
+                "
+                v-if="isCurrentUserManager"
+              />
+
+              <span class="metadata-value selectable" v-else>
+                {{ getMetadataFieldValue({ field_name: 'resolution' }, asset) }}
+              </span>
+            </td>
+
             <!-- other Metadata cells -->
             <td
               class="metadata-descriptor"
@@ -424,7 +482,7 @@
               @edit-clicked="$emit('edit-clicked', asset)"
               @delete-clicked="$emit('delete-clicked', asset)"
               @restore-clicked="$emit('restore-clicked', asset)"
-              v-if="isCurrentUserManager"
+              v-if="isCurrentUserManager && !asset.shared"
             />
             <td class="actions" v-else></td>
           </tr>
@@ -465,9 +523,17 @@
         v-show="displayedAssetsTimeSpent > 0 || displayedAssetsEstimation > 0"
       >
         ({{ formatDuration(displayedAssetsTimeSpent) }}
-        {{ $tc('main.days_spent', displayedAssetsTimeSpent) }},
+        {{
+          isDurationInHours()
+            ? $tc('main.hours_spent', displayedAssetsTimeSpent)
+            : $tc('main.days_spent', displayedAssetsTimeSpent)
+        }},
         {{ formatDuration(displayedAssetsEstimation) }}
-        {{ $tc('main.man_days', displayedAssetsEstimation) }})
+        {{
+          isDurationInHours()
+            ? $tc('main.hours_estimated', displayedAssetsEstimation)
+            : $tc('main.man_days', displayedAssetsEstimation)
+        }})
       </span>
     </p>
   </div>
@@ -558,6 +624,7 @@ export default {
       metadataDisplayHeaders: {
         estimation: true,
         readyFor: true,
+        resolution: true,
         timeSpent: true
       },
       stickedColumns: {},
@@ -583,7 +650,9 @@ export default {
       'displayedAssetsTimeSpent',
       'displayedAssetsEstimation',
       'nbSelectedTasks',
+      'organisation',
       'isAssetDescription',
+      'isAssetResolution',
       'isBigThumbnails',
       'isCurrentUserClient',
       'isCurrentUserManager',
@@ -684,6 +753,10 @@ export default {
 
     isAssetsOnly() {
       return this.currentProduction.production_type === 'assets'
+    },
+
+    formatDurationInHours() {
+      return this.organisation.format_duration_in_hours
     }
   },
 
@@ -713,6 +786,9 @@ export default {
 
     // Selectable if the task type is included in the workflow.
     isSelectable(asset, columnId) {
+      if (asset.shared) {
+        return false
+      }
       const key = asset.asset_type_id + columnId
       if (this.isSelectableMap === undefined) this.isSelectableMap = {}
       if (this.isSelectableMap[key] === undefined) {
@@ -944,6 +1020,12 @@ td.estimation {
   width: 60px;
 }
 
+td.resolution {
+  min-width: 110px;
+  max-width: 110px;
+  width: 110px;
+}
+
 th.ready-for,
 td.ready-for {
   max-width: 180px;
@@ -985,6 +1067,21 @@ td.ready-for {
   flex: 1;
 }
 
+.datatable-row.shared {
+  > th,
+  > td {
+    opacity: 0.6;
+    background: color-mix(
+      in srgb,
+      var(--shared-color) 20%,
+      transparent
+    ) !important;
+  }
+  > td > :deep(*) {
+    display: none;
+  }
+}
+
 .datatable-row th.name {
   font-size: 1.1em;
   padding: 6px;
@@ -1010,6 +1107,7 @@ input[type='number'] {
 
 // Metadata cell CSS
 
+td.resolution,
 td.metadata-descriptor {
   height: 3.1rem;
   max-width: 120px;

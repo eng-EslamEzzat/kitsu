@@ -263,16 +263,26 @@
         class="breakdown-column assets-column"
         v-if="isCurrentUserManager"
       >
-        <div class="flexrow mb1 mt0">
-          <h2 class="flexrow subtitle">
-            {{ $t('breakdown.all_assets') }}
-          </h2>
-          <span class="filler"></span>
+        <h2 class="subtitle">
+          {{ $t('breakdown.all_assets') }}
+        </h2>
+        <div class="flexrow mt1 mb1">
           <button-simple
             class="flexrow-item"
             :title="$t('assets.new_asset')"
             icon="plus"
             @click="modals.isNewDisplayed = true"
+            v-if="!isOnlyCurrentEpisode"
+          />
+          <span class="filler"></span>
+
+          <button-simple
+            class="flexrow-item"
+            :text="$t('breakdown.show_library')"
+            icon="assets"
+            :is-on="libraryDisplayed"
+            @click="libraryDisplayed = !libraryDisplayed"
+            v-if="!isOnlyCurrentEpisode"
           />
           <button-simple
             class="flexrow-item"
@@ -329,6 +339,7 @@
               @add-one="addOneAsset"
               @add-ten="addTenAssets"
               v-for="asset in typeAssets"
+              v-show="libraryDisplayed || !asset.shared"
             />
           </div>
         </div>
@@ -477,6 +488,7 @@ export default {
       isLoading: false,
       isOnlyCurrentEpisode: false,
       isTextMode: false,
+      libraryDisplayed: false,
       optionalCsvColumns: ['Label'],
       parsedCSV: [],
       removalData: {},
@@ -612,8 +624,7 @@ export default {
           newGroup = typeGroup.filter(asset => {
             return (
               asset.episode_id === this.currentEpisode.id ||
-              (asset.casting_episode_ids &&
-                asset.casting_episode_ids.includes(this.currentEpisode.id))
+              asset.casting_episode_ids?.includes(this.currentEpisode.id)
             )
           })
         }
@@ -653,11 +664,15 @@ export default {
       } else if (this.isShotCasting) {
         return this.castingSequenceShots
       } else {
-        if (this.isTVShow && this.currentEpisode.id !== 'main') {
+        if (
+          this.isTVShow &&
+          this.currentEpisode &&
+          this.currentEpisode.id !== 'main'
+        ) {
           return this.castingAssetTypeAssets.filter(
             asset =>
               asset.episode_id === this.currentEpisode.id ||
-              asset.casting_episode_ids.includes(this.currentEpisode.id)
+              asset.casting_episode_ids?.includes(this.currentEpisode.id)
           )
         } else if (this.isTVShow && this.currentEpisode.id === 'main') {
           return this.castingAssetTypeAssets.filter(asset => !asset.episode_id)
@@ -797,7 +812,7 @@ export default {
       } else {
         this.setCastingEpisode(null)
       }
-      this.loadAssets(true).then(() => {
+      this.loadAssets({ all: true, withTasks: true }).then(() => {
         this.isLoading = false
         this.displayMoreAssets()
         this.setCastingAssetTypes()
@@ -913,41 +928,34 @@ export default {
       }
     },
 
-    addOneAsset(assetId) {
+    async addOneAsset(assetId, amount = 1) {
       this.isLocked = true
-      Object.keys(this.selection)
-        .filter(key => this.selection[key])
-        .forEach(entityId => {
-          this.addAssetToCasting({
-            entityId,
-            assetId,
-            nbOccurences: 1,
-            label: this.castingType === 'shot' ? 'animate' : 'fixed'
-          })
-          delete this.saveErrors[entityId]
-          this.saveCasting(entityId)
-            .then(this.setLock)
-            .catch(err => {
-              this.saveErrors[entityId] = true
-              console.error(err)
-            })
+      const entityIds = Object.keys(this.selection).filter(
+        key => this.selection[key]
+      )
+
+      for (const entityId of entityIds) {
+        this.addAssetToCasting({
+          entityId,
+          assetId,
+          nbOccurences: amount,
+          label: this.castingType === 'shot' ? 'animate' : 'fixed'
         })
+
+        delete this.saveErrors[entityId]
+
+        try {
+          await this.saveCasting(entityId)
+          this.setLock()
+        } catch (err) {
+          this.saveErrors[entityId] = true
+          console.error(err)
+        }
+      }
     },
 
-    addTenAssets(assetId) {
-      this.isLocked = true
-      Object.keys(this.selection)
-        .filter(key => this.selection[key])
-        .forEach(entityId => {
-          this.addAssetToCasting({ entityId, assetId, nbOccurences: 10 })
-          delete this.saveErrors[entityId]
-          this.saveCasting(entityId)
-            .then(this.setLock)
-            .catch(err => {
-              this.saveErrors[entityId] = true
-              console.error(err)
-            })
-        })
+    async addTenAssets(assetId) {
+      this.addOneAsset(assetId, 10)
     },
 
     confirmAssetRemoval() {
@@ -962,7 +970,7 @@ export default {
       this.loading.remove = true
       this.removeAssetFromCasting({ entityId, assetId, nbOccurences })
       delete this.saveErrors[entityId]
-      this.saveCasting(entityId)
+      return this.saveCasting(entityId)
         .then(() => {
           this.setLock()
           this.modals.isRemoveConfirmationDisplayed = false
@@ -977,15 +985,17 @@ export default {
         })
     },
 
-    removeOneAssetFromSelection(assetId) {
-      Object.keys(this.selection)
-        .filter(key => this.selection[key])
-        .forEach(entityId => {
-          const nbOccurences = this.casting[entityId].find(
-            asset => asset.asset_id === assetId
-          ).nb_occurences
-          this.removeOneAsset(assetId, entityId, nbOccurences)
-        })
+    async removeOneAssetFromSelection(assetId) {
+      const entityIds = Object.keys(this.selection).filter(
+        key => this.selection[key]
+      )
+
+      for (const entityId of entityIds) {
+        const nbOccurences = this.casting[entityId].find(
+          asset => asset.asset_id === assetId
+        ).nb_occurences
+        await this.removeOneAsset(assetId, entityId, nbOccurences)
+      }
     },
 
     removeOneAsset(assetId, entityId, nbOccurences) {
@@ -993,18 +1003,9 @@ export default {
       if (this.isEpisodeCasting && nbOccurences === 1) {
         this.removalData = { assetId, entityId, nbOccurences }
         this.modals.isRemoveConfirmationDisplayed = true
+        return Promise.resolve()
       } else {
-        this.saveAssetRemoval(entityId, assetId, 1)
-      }
-    },
-
-    removeTenAssets(assetId, entityId, nbOccurences) {
-      this.isLocked = true
-      if (this.isEpisodeCasting && nbOccurences < 10) {
-        this.removalData = { assetId, entityId, nbOccurences }
-        this.modals.isRemoveConfirmationDisplayed = true
-      } else {
-        this.saveAssetRemoval(entityId, assetId, 10)
+        return this.saveAssetRemoval(entityId, assetId, 1)
       }
     },
 
@@ -1100,7 +1101,7 @@ export default {
           }
         }
       } else if (this.isAssetCasting) {
-        const assetTypeId = this.$route.params.asset_type_id
+        const assetTypeId = this.$route.params.asset_type_id || ''
         if (assetTypeId !== this.assetTypeId) {
           isChange = true
           route = {
@@ -1237,25 +1238,25 @@ export default {
       clipboard.copyCasting(selectedCasting)
     },
 
-    pasteCasting() {
+    async pasteCasting() {
       const castingToPaste = clipboard.pasteCasting()
       if (!castingToPaste || castingToPaste.length === 0) return
       const selectedElements = Object.keys(this.selection).filter(
         key => this.selection[key]
       )
-      selectedElements.forEach(entityId => {
+      for (const entityId of selectedElements) {
         this.setEntityCasting({
           entityId,
           casting: castingToPaste
         })
         delete this.saveErrors[entityId]
-        this.saveCasting(entityId)
+        await this.saveCasting(entityId)
           .then(this.setLock)
           .catch(err => {
             this.saveErrors[entityId] = true
             console.error(err)
           })
-      })
+      }
       return castingToPaste
     },
 

@@ -1064,7 +1064,7 @@ input.input:focus {
   background: #67be4b;
 }
 
-input[type='checkbox'] {
+input[type='checkbox']:not([disabled]) {
   cursor: pointer;
 }
 
@@ -1736,6 +1736,67 @@ tbody:last-child .empty-line:last-child {
 
 .datatable tbody:first-of-type .datatable-type-header th::before {
   display: none;
+}
+
+th .input-editor,
+td .input-editor {
+  background: transparent;
+  border: 1px solid transparent;
+  color: $grey-strong;
+  height: 100%;
+  padding: 0.5rem;
+  width: 100%;
+  z-index: 100;
+
+  &:active,
+  &:focus,
+  &:hover {
+    background: transparent;
+    background: white;
+  }
+
+  &:active,
+  &:focus {
+    border: 1px solid $green;
+  }
+
+  &:hover {
+    border: 1px solid $light-green;
+  }
+
+  &:invalid,
+  &.error {
+    color: $red;
+  }
+}
+
+.dark {
+  th .input-editor,
+  td .select select,
+  td .input-editor {
+    color: $white;
+
+    option {
+      background: $dark-grey-light;
+      color: $white;
+    }
+
+    &:focus,
+    &:active,
+    &:hover {
+      background: $dark-grey-light;
+    }
+  }
+}
+
+td.frames,
+td.framein,
+td.frameout,
+td.max-retakes,
+td.resolution,
+td.fps {
+  height: 3.1rem;
+  padding: 0;
 }
 
 .resizable {

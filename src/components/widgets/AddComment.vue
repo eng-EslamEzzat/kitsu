@@ -441,21 +441,29 @@ export default {
   },
 
   mounted() {
-    ;[
-      'drag',
-      'dragstart',
-      'dragend',
-      'dragover',
-      'dragenter',
-      'dragleave',
-      'drop'
-    ].forEach(evt => {
-      if (this.$refs.wrapper) {
-        this.$refs.wrapper.addEventListener(evt, e => {
-          e.preventDefault()
-          e.stopPropagation()
-        })
-      }
+    const production = this.productionMap.get(this.task.project_id)
+    this.mode =
+      production.is_publish_default_for_artists && this.isCurrentUserArtist
+        ? 'publish'
+        : 'status'
+
+    this.$nextTick(() => {
+      ;[
+        'drag',
+        'dragstart',
+        'dragend',
+        'dragover',
+        'dragenter',
+        'dragleave',
+        'drop'
+      ].forEach(evt => {
+        if (this.$refs.wrapper) {
+          this.$refs.wrapper.addEventListener(evt, e => {
+            e.preventDefault()
+            e.stopPropagation()
+          })
+        }
+      })
     })
   },
 
@@ -465,6 +473,7 @@ export default {
       'isCurrentUserArtist',
       'isCurrentUserClient',
       'productionDepartmentIds',
+      'productionMap',
       'taskStatusForCurrentUser',
       'taskStatusMap',
       'taskTypeMap',
@@ -618,10 +627,24 @@ export default {
 
     onDrop(event) {
       if (event.target.id === 'drop-mask') return
-      /*
-      if (event.target.parentElement?.className?.indexOf('box')) return
-      if (event.target.parentElement?.className?.indexOf('buttons')) return
-      */
+      if (
+        event.target.parentElement?.className?.indexOf('add-attachment-box') >=
+        0
+      )
+        return
+      if (
+        event.target.parentElement?.className?.indexOf(
+          'add-attachment-buttons'
+        ) >= 0
+      )
+        return
+      if (
+        event.target.parentElement?.className?.indexOf(
+          'attachment-modal-box'
+        ) >= 0
+      )
+        return
+
       const forms = []
       for (let i = 0; i < event.dataTransfer.files.length; i++) {
         const form = new FormData()

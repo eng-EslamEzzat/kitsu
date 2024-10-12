@@ -76,6 +76,11 @@ export default {
 }
 
 .avatar-name {
+  color: $black;
   margin-left: 0.8em;
+
+  .dark & {
+    color: $white;
+  }
 }
 </style>

@@ -18,6 +18,13 @@
               icon="filter"
               @click="modals.isBuildFilterDisplayed = true"
             />
+            <button-simple
+              class="flexrow-item"
+              icon="assets"
+              :is-on="showSharedAssets"
+              :title="$t('breakdown.show_library')"
+              @click="showSharedAssets = !showSharedAssets"
+            />
             <div class="flexrow-item filler"></div>
             <div class="flexrow flexrow-item" v-if="!isCurrentUserClient">
               <combobox-department
@@ -79,7 +86,11 @@
         />
         <asset-list
           ref="asset-list"
-          :displayed-assets="displayedAssetsByType"
+          :displayed-assets="
+            showSharedAssets
+              ? displayedAssetsByType
+              : displayedAssetsByTypeWithoutShared
+          "
           :is-loading="isAssetsLoading || initialLoading"
           :is-error="isAssetsLoadingError"
           :validation-columns="assetValidationColumns"
@@ -324,6 +335,10 @@ export default {
       deleteAllTasksLockText: null,
       descriptorToEdit: {},
       departmentFilter: [],
+      showSharedAssets: true,
+      optionalColumns: ['Description', 'Ready for'],
+      pageName: 'Assets',
+      parsedCSV: [],
       selectedDepartment: 'ALL',
       taskTypeForTaskDeletion: null,
       errors: {
@@ -369,9 +384,6 @@ export default {
         isImportRenderDisplayed: false,
         isNewDisplayed: false
       },
-      pageName: 'Assets',
-      optionalColumns: ['Description', 'Ready for'],
-      parsedCSV: [],
       success: {
         edit: false
       }
@@ -398,13 +410,19 @@ export default {
         this.searchField.setValue(searchQuery)
         this.onSearchChange()
         this.$refs['asset-list'].setScrollPosition(this.assetListScrollPosition)
+        this.$nextTick(() => {
+          this.$refs['asset-list'].selectTaskFromQuery()
+        })
       }
     }
 
     if (
       this.assetMap.size < 2 ||
+      this.assetValidationColumns.length === 0 ||
       (this.assetValidationColumns.length > 0 &&
-        !this.assetMap.get(this.assetMap.keys().next().value).validations)
+        (!this.assetMap.get(this.assetMap.keys().next().value).validations ||
+          this.assetMap.get(this.assetMap.keys().next().value).validations
+            .size === 0))
     ) {
       setTimeout(() => {
         this.loadAssets().then(() => {
@@ -464,6 +482,12 @@ export default {
 
     searchField() {
       return this.$refs['asset-search-field']
+    },
+
+    displayedAssetsByTypeWithoutShared() {
+      return this.displayedAssetsByType.map(type =>
+        type.filter(asset => !asset.shared)
+      )
     },
 
     filteredAssets() {
@@ -823,6 +847,7 @@ export default {
         this.setAssetSearch(searchQuery)
         this.setSearchInUrl()
       }
+      this.clearSelection()
     },
 
     saveSearchQuery(searchQuery) {

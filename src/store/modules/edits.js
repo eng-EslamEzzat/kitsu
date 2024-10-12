@@ -214,7 +214,11 @@ const helpers = {
     result = sortEditResult(result, sorting, taskTypeMap, taskMap)
     cache.result = result
 
-    const displayedEdits = result.slice(0, PAGE_SIZE)
+    const limit =
+      state.displayedEdits.length > PAGE_SIZE
+        ? state.displayedEdits.length
+        : PAGE_SIZE
+    const displayedEdits = result.slice(0, limit)
     const maxX = displayedEdits.length
     const maxY = state.nbValidationColumns
 
@@ -255,6 +259,7 @@ const initialState = {
   isEditDescription: false,
   isEditEstimation: false,
   isEditTime: false,
+  isEditResolution: false,
 
   displayedEdits: [],
   displayedEditsCount: 0,
@@ -292,6 +297,7 @@ const getters = {
   isEditDescription: state => state.isEditDescription,
   isEditEstimation: state => state.isEditEstimation,
   isEditTime: state => state.isEditTime,
+  isEditResolution: state => state.isEditResolution,
 
   editSearchText: state => state.editSearchText,
   editSelectionGrid: state => state.editSelectionGrid,
@@ -700,6 +706,7 @@ const mutations = {
     let isDescription = false
     let isTime = false
     let isEstimation = false
+    let isResolution = false
     state.editMap = new Map()
     edits.forEach(edit => {
       const taskIds = []
@@ -736,6 +743,7 @@ const mutations = {
       if (!isTime && edit.timeSpent > 0) isTime = true
       if (!isEstimation && edit.estimation > 0) isEstimation = true
       if (!isDescription && edit.description) isDescription = true
+      if (!isResolution && edit.resolution) isResolution = true
 
       state.editMap.set(edit.id, edit)
     })
@@ -757,6 +765,7 @@ const mutations = {
     state.isEditTime = isTime
     state.isEditEstimation = isEstimation
     state.isEditDescription = isDescription
+    state.isEditResolution = isResolution
 
     state.isEditsLoading = false
     state.isEditsLoadingError = false
@@ -841,6 +850,9 @@ const mutations = {
     if (!newEdit.data) newEdit.data = {}
     if (edit.description && !state.isEditDescription) {
       state.isEditDescription = true
+    }
+    if (edit.resolution && !state.isEditResolution) {
+      state.isEditResolution = true
     }
   },
 
@@ -938,6 +950,17 @@ const mutations = {
   },
 
   [REMOVE_SELECTED_TASK](state, validationInfo) {
+    if (
+      !validationInfo.x &&
+      validationInfo.task?.column &&
+      state.editMap.get(validationInfo.task.entity.id)
+    ) {
+      const entity = validationInfo.task.entity
+      const taskType = validationInfo.task.column
+      const list = state.displayedEdits.flat()
+      validationInfo.x = list.findIndex(e => e.id === entity.id)
+      validationInfo.y = state.editValidationColumns.indexOf(taskType.id)
+    }
     if (
       state.editSelectionGrid[0] &&
       state.editSelectionGrid[validationInfo.x]

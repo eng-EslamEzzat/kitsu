@@ -592,6 +592,7 @@ export const playerMixin = {
         nextFrameTime = nextFrame / this.fps
         this.setFullPlayerTime(nextFrameTime)
       } else {
+        if (!this.rawPlayer) return
         const nextFrameTime =
           this.rawPlayer.getCurrentTimeRaw() + this.frameDuration + 0.0001
         const nextFrame = Math.round(nextFrameTime * this.fps)
@@ -641,6 +642,12 @@ export const playerMixin = {
       this.container.setAttribute('data-fullscreen', !!false)
       document.activeElement.blur()
       this.fullScreen = false
+      setTimeout(() => {
+        this.triggerResize()
+      }, 200)
+      setTimeout(() => {
+        this.triggerResize()
+      }, 500)
     },
 
     isFullScreen() {
@@ -755,6 +762,12 @@ export const playerMixin = {
     onFullScreenChange() {
       if (this.fullScreen && !this.isFullScreen()) {
         this.fullScreen = false
+        setTimeout(() => {
+          this.triggerResize()
+        }, 200)
+        setTimeout(() => {
+          this.triggerResize()
+        }, 500)
       }
     },
 
@@ -892,7 +905,7 @@ export const playerMixin = {
 
     onFilmClicked() {
       this.isEntitiesHidden = !this.isEntitiesHidden
-      window.dispatchEvent(new Event('resize'))
+      this.triggerResize()
       this.$nextTick(() => {
         this.resetHeight()
         this.scrollToEntity(this.playingEntityIndex)
@@ -940,7 +953,7 @@ export const playerMixin = {
       if (!this.isCommentsHidden) {
         this.$refs['task-info'].$el.style.height = `${height}px`
       }
-      window.dispatchEvent(new Event('resize'))
+      this.triggerResize()
       this.$nextTick(() => {
         this.$refs['task-info'].focusCommentTextarea()
         this.resetHeight()
@@ -1409,6 +1422,10 @@ export const playerMixin = {
           return resolve(file)
         })
       })
+    },
+
+    triggerResize() {
+      window.dispatchEvent(new Event('resize'))
     }
   },
 

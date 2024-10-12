@@ -321,7 +321,6 @@ export default {
       'setCurrentEpisode'
     ]),
 
-    // TODO: module actions
     setConceptSearch: searchQuery => Promise.resolve(),
     saveConceptSearch: searchQuery => Promise.resolve(),
     removeConceptSearch: searchQuery => Promise.resolve(),
@@ -359,8 +358,10 @@ export default {
     async refreshConcepts() {
       this.loading.loadingConcepts = true
       try {
-        this.setCurrentEpisode('all') // mandatory to load all assets
-        await this.loadAssets(true)
+        if (this.isTVShow) {
+          this.setCurrentEpisode('all') // mandatory to load all assets of a TV show
+        }
+        await this.loadAssets({ all: true })
         await this.loadConcepts()
       } catch (err) {
         console.error(err)
