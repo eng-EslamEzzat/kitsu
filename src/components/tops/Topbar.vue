@@ -107,25 +107,7 @@
           class="flexrow-item mr0"
           v-if="mainConfig.indexer_configured"
         />
-        <div class="nav-item">
-          <a
-            class="changelog-button"
-            target="_blank"
-            href="https://cgwire.canny.io/changelog"
-          >
-            <zap-icon />
-          </a>
-        </div>
         <notification-bell class="nav-item notification-bell" />
-        <div class="nav-item">
-          <a
-            class="help-button"
-            href="https://kitsu.cg-wire.com/"
-            target="_blank"
-          >
-            <help-circle-icon />
-          </a>
-        </div>
         <div class="nav-item pointer" @click="toggleUserMenu">
           <people-avatar
             class="avatar"
@@ -152,30 +134,14 @@
             {{ $t('main.profile') }}
           </router-link>
         </li>
-        <li @click="toggleDarkTheme">
-          {{ !isDarkTheme ? $t('main.dark_theme') : $t('main.white_theme') }}
-        </li>
         <hr />
-        <li>
-          <a
-            href="https://www.youtube.com/playlist?list=PLp_1gB5ZBHXqnQgZ4TCrAt7smxesaDo29"
-            target="_blank"
-          >
-            {{ $t('main.tutorials') }}
-          </a>
-        </li>
         <li>
           <a @click="display.shortcutModal = true">
             {{ $t('keyboard.shortcuts') }}
           </a>
         </li>
         <hr />
-        <li>
-          <a href="https://cg-wire.com/about" target="_blank">
-            {{ $t('main.about') }}
-          </a>
-        </li>
-        <li class="version">Kitsu {{ kitsuVersion }}</li>
+        <li class="version">Version {{ kitsuVersion }}</li>
         <hr />
         <li class="flexrow" @click="onLogoutClicked">
           <log-out-icon class="flexrow-item icon-1x" />
