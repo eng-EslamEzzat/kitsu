@@ -627,7 +627,7 @@ export default {
       }
       return (
         `${productionName} - ${episodeName}` +
-        ` | ${this.$t('playlists.title')} - Kitsu`
+        ` | ${this.$t('playlists.title')} - Aroma`
       )
     },
 
@@ -635,7 +635,7 @@ export default {
       const productionName = this.currentProduction
         ? this.currentProduction.name
         : ''
-      return `${productionName} ${this.$t('playlists.title')} - Kitsu`
+      return `${productionName} ${this.$t('playlists.title')} - Aroma`
     },
 
     taskTypeList() {

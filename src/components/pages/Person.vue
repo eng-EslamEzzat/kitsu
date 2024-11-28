@@ -798,7 +798,7 @@ export default {
 
   metaInfo() {
     return {
-      title: `${this.person?.name || '...'} - Kitsu`
+      title: `${this.person?.name || '...'} - Aroma`
     }
   },
 

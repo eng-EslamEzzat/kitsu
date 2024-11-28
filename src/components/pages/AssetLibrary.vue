@@ -251,7 +251,7 @@ export default {
 
   metaInfo() {
     return {
-      title: `${this.$t('library.asset_library')} - Kitsu`
+      title: `${this.$t('library.asset_library')} - Aroma`
     }
   }
 }

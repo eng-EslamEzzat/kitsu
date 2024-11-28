@@ -202,7 +202,7 @@ export default {
 
   metaInfo() {
     return {
-      title: `${this.$t('studios.title')} - Kitsu`
+      title: `${this.$t('studios.title')} - Aroma`
     }
   }
 }

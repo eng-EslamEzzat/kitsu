@@ -182,7 +182,7 @@ export default {
 
   metaInfo() {
     return {
-      title: `${this.$t('backgrounds.title')} - Kitsu`
+      title: `${this.$t('backgrounds.title')} - Aroma`
     }
   }
 }

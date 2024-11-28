@@ -426,7 +426,7 @@ export default {
     return {
       title:
         `${this.currentProduction.name} ` +
-        `| ${this.$t('schedule.title')} - Kitsu`
+        `| ${this.$t('schedule.title')} - Aroma`
     }
   }
 }

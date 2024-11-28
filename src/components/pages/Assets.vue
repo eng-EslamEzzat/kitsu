@@ -528,13 +528,13 @@ export default {
       }
       return (
         `${productionName} - ${episodeName}` +
-        ` | ${this.$t('assets.title')} - Kitsu`
+        ` | ${this.$t('assets.title')} - Aroma`
       )
     },
 
     shortPageTitle() {
       const productionName = this.currentProduction?.name || ''
-      return `${productionName} ${this.$t('assets.title')} - Kitsu`
+      return `${productionName} ${this.$t('assets.title')} - Aroma`
     },
 
     dataMatchers() {

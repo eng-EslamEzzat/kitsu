@@ -1247,11 +1247,11 @@ export default {
         title:
           `${this.currentProduction ? this.currentProduction.name : ''}` +
           ` - ${this.currentEpisode ? this.currentEpisode.name : ''}` +
-          ` | ${this.$t('shots.title')} - Kitsu`
+          ` | ${this.$t('shots.title')} - Aroma`
       }
     }
     return {
-      title: `${this.currentProduction.name} ${this.$t('shots.title')} - Kitsu`
+      title: `${this.currentProduction.name} ${this.$t('shots.title')} - Aroma`
     }
   }
 }

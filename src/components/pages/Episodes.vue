@@ -668,7 +668,7 @@ export default {
     return {
       title: `${this.currentProduction.name} ${this.$t(
         'episodes.title'
-      )} - Kitsu`
+      )} - Aroma`
     }
   }
 }

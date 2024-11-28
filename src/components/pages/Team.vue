@@ -217,7 +217,7 @@ export default {
     return {
       title: `${this.currentProduction.name} | ${this.$t(
         'people.team'
-      )} - Kitsu`
+      )} - Aroma`
     }
   }
 }

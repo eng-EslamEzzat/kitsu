@@ -285,7 +285,7 @@ export default {
   },
 
   metaInfo() {
-    return { title: `${this.$t('tasks.all_tasks')} - Kitsu` }
+    return { title: `${this.$t('tasks.all_tasks')} - Aroma` }
   }
 }
 </script>

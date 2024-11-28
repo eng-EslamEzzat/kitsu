@@ -1457,10 +1457,10 @@ export default {
   },
 
   metaInfo() {
-    let title = 'Loading task... - Kitsu'
+    let title = 'Loading task... - Aroma'
     if (this.task) {
       const taskTypeName = this.taskTypeMap.get(this.task.task_type_id).name
-      title = `${this.title} / ${taskTypeName} - Kitsu`
+      title = `${this.title} / ${taskTypeName} - Aroma`
     }
     return { title }
   }
