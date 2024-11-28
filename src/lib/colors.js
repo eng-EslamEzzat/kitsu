@@ -32,7 +32,7 @@ export default {
     })
     if (
       darken ||
-      (localStorage && localStorage.getItem('dark-theme') === 'true')
+      ('true' === 'true')
     ) {
       colorHash = new colorHashConstructor({
         lightness: 0.6,

@@ -18,7 +18,7 @@ import {
 const initialState = {
   currentProductionScreen: 'assets',
   currentSection: 'assets',
-  isDarkTheme: false,
+  isDarkTheme: true,
   isSidebarHidden: true,
   isSupportChat: true,
   isUserMenuHidden: true,
@@ -44,12 +44,6 @@ const getters = {
 }
 
 const actions = {
-  toggleDarkTheme({ commit, state }) {
-    commit(TOGGLE_DARK_THEME)
-    if (localStorage) {
-      localStorage.setItem('dark-theme', state.isDarkTheme)
-    }
-  },
 
   setSupportChat({ commit, state }, isSupportChat) {
     commit(TOGGLE_SUPPORT_CHAT, isSupportChat)

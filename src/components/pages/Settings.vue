@@ -152,7 +152,7 @@ export default {
         timesheets_locked: 'false',
         use_original_file_name: 'false',
         format_duration_in_hours: 'false',
-        dark_theme_by_default: 'false'
+        dark_theme_by_default: 'true'
       },
       errors: {
         save: false,
@@ -285,9 +285,7 @@ export default {
           format_duration_in_hours: this.organisation.format_duration_in_hours
             ? 'true'
             : 'false',
-          dark_theme_by_default: this.organisation.dark_theme_by_default
-            ? 'true'
-            : 'false'
+          dark_theme_by_default: 'true'
         }
       }
     }

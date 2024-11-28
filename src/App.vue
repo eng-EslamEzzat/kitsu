@@ -63,13 +63,9 @@ export default {
   },
 
   async mounted() {
-    if (localStorage.getItem('dark-theme') === 'true' && !this.isDarkTheme) {
-      this.$store.commit('TOGGLE_DARK_THEME')
+    if ('true') {
       document.documentElement.style.background = '#36393F'
       document.body.style.background = '#36393F'
-    } else {
-      document.documentElement.style.background = '#FFF'
-      document.body.style.background = '#FFF'
     }
     const config = await this.setMainConfig()
     // Setup Crisp
@@ -130,8 +126,8 @@ export default {
         document.documentElement.style.background = '#36393F'
         document.body.style.background = '#36393F'
       } else {
-        document.documentElement.style.background = '#FFF'
-        document.body.style.background = '#FFF'
+        document.documentElement.style.background = '#36393F'
+        document.body.style.background = '#36393F'
       }
     },
 
