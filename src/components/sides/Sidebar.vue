@@ -9,7 +9,7 @@
               v-if="organisation && organisation.has_avatar"
             />
             <img
-              src="../../assets/kitsu-text-dark.svg"
+              src="../../assets/openpype_splash.png"
               width="180"
               v-else-if="isDarkTheme"
             />

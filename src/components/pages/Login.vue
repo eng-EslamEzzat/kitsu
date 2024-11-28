@@ -9,7 +9,7 @@
         xyz="fade"
       >
         <div class="has-text-centered login-header">
-          <img src="../../assets/kitsu-text-dark.svg" v-if="isDarkTheme" />
+          <img src="../../assets/openpype_icon.png" v-if="isDarkTheme" />
           <img src="../../assets/kitsu-text.svg" v-else />
         </div>
         <form v-if="!(isMissingOTP || isWrongOTP)">
