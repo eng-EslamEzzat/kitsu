@@ -7,7 +7,6 @@
       class="flexrow open-productions-header"
       v-if="!isOpenProductionsLoading && openProductions.length > 0"
     >
-      <img class="logo" src="../../assets/kitsu.png" width="23" />
       <h1 class="title filler">
         {{ $t('productions.home.title') }}
       </h1>
