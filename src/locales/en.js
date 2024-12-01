@@ -453,7 +453,7 @@ export default {
     error_sending_email: 'An error occurred while sending OTP via email.',
     first_connection: 'For your first time login, you need to set up a password. To do this, you must run the reset password procedure.',
     first_connection_2: 'Please provide the email used for your Kitsu account and we will send you the reset password link.',
-    first_connection_title: 'Welcome to Kitsu!',
+    first_connection_title: 'Welcome to Aroma!',
     forgot_password: 'Forgot password?',
     information_totp: 'Open the two-factor authenticator (TOTP) app on your mobile device to view your authentication code.',
     information_fido: 'Plug your FIDO device into your computer.',
@@ -475,7 +475,7 @@ export default {
     reset_password_title: 'Enter your email to reset your password',
     retry_fido_challenge: 'Retry FIDO challenge',
     send_email_otp: 'Resend OTP by email',
-    title: 'Log in to Kitsu',
+    title: 'Log in to Aroma',
     too_many_failed_login_attemps: 'Too many failed login attempts, please wait one minute.',
     unable_to_verify_email_otp: 'Unable to verify with email?',
     unable_to_verify_recovery_code: 'Don\'t have a recovery code?',
@@ -1033,7 +1033,7 @@ export default {
       no_task: 'You have no task assigned. Consult with your supervisor to see what you can do!',
       no_prod_for_client: 'You don\'t have access to any productions. Contact your site admin to obtain access.',
       title: 'My Productions',
-      welcome: 'Welcome to Kitsu'
+      welcome: 'Welcome to Aroma'
     },
 
     fields: {

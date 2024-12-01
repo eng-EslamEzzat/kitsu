@@ -18,7 +18,7 @@
             :src="logoPath"
             v-if="organisation?.has_avatar"
           />
-          <img class="studio-logo" src="@/assets/openpype_splash.png" v-else />
+          <img class="studio-logo" src="@/assets/aroma_icon.png" v-else />
         </a>
         <span class="studio-logo-wrapper nav-item" v-else>
           <img
@@ -26,7 +26,7 @@
             :src="logoPath"
             v-if="organisation?.has_avatar"
           />
-          <img class="studio-logo" src="@/assets/openpype_splash.png" v-else />
+          <img class="studio-logo" src="@/assets/aroma_icon.png" v-else />
         </span>
 
         <div class="flexrow topbar-menu" v-if="isProductionContext">
